@@ -1,3 +1,4 @@
+param([string]$CommitMessage = 'Atualiza rifa entre amigos')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
@@ -21,6 +22,6 @@ if ($LASTEXITCODE -ne 0 -or $currentRemote -ne $expectedRemote) { throw 'O desti
 Invoke-Checked git @('add', 'public', 'supabase', 'scripts', '.github', '.gitignore', 'package.json', 'README.md')
 & git diff --cached --quiet
 if ($LASTEXITCODE -eq 1) {
-    Invoke-Checked git @('commit', '-m', 'Implementa rifa com 100 números, reservas e publicação no Pages')
+    Invoke-Checked git @('commit', '-m', $CommitMessage)
 } elseif ($LASTEXITCODE -ne 0) { throw 'Não foi possível verificar os arquivos preparados.' }
 Invoke-Checked git @('-c', 'credential.helper=', '-c', 'credential.helper=!gh auth git-credential', 'push', '-u', 'origin', 'main')

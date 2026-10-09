@@ -8,5 +8,5 @@ window.RIFA_CONFIG = {
   supabaseUrl: 'https://ohpgwezeacxldhofmafl.supabase.co',
   supabasePublicKey: 'sb_publishable_K6yCDXeAK2dY5KsRAQlh9g_cAUo-VSx', // Chave pública. Nunca service_role.
   reservationsEnabled: true, // Autenticação e organizador confirmados.
-  adminSignupEnabled: true, // Site URL configurada no Supabase.
+  adminSignupEnabled: false, // Organizador já cadastrado; login para a conta autorizada.
 };

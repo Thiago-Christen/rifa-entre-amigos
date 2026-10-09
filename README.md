@@ -1,5 +1,9 @@
 # Rifa entre amigos
 
+A interface usa tons verdes, cartões arredondados e a foto da cesta em destaque. Clientes selecionam e reservam números sem criar conta. O botão **Organizador** abre o login; após a autorização no banco, a compra sai de cena e um painel próprio mostra reservas, filtros, busca e valores confirmados. A sessão do organizador é restaurada na mesma aba e revalidada no servidor; **Sair da conta** encerra o acesso. Atualizações automáticas a cada 15 segundos e animações com suporte a movimento reduzido.
+
+Para verificar o login sem contas ou pagamentos reais, execute `node scripts/auth-fixture.mjs` e abra http://127.0.0.1:4176. Login fictício: `organizador@example.test`, qualquer senha fictícia. Outro e-mail é tratado como cliente sem permissão. Este servidor não vai para o GitHub Pages e nunca se conecta ao Supabase.
+
 Site: https://thiago-christen.github.io/rifa-entre-amigos/
 
 Projeto gratuito Supabase: `ohpgwezeacxldhofmafl`, região São Paulo. O schema já foi aplicado no projeto hospedado; não execute novamente. `public/config.js` está conectado ao banco com `reservationsEnabled: true`.

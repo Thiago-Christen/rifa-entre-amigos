@@ -32,11 +32,11 @@ try {
   assert.equal(await other.locator('[data-number="1"]').isDisabled(),true);
   await page.locator('#admin-open').click(); await page.waitForSelector('.booking-card');
   assert.equal(await page.locator('.booking-card img').count(),0);
-  page.on('dialog', dialog => dialog.accept());
   await page.getByRole('button',{name:'Confirmar pagamento',exact:true}).click();
+  await page.locator('#action-confirm').click();
   await page.waitForSelector('.number.paid');
   assert.equal(await page.locator('.number.paid').count(),2);
-  await page.locator('#admin-close').click(); await page.reload(); await page.waitForSelector('.number.paid');
+  await page.locator('#logout').click(); await page.reload(); await page.waitForSelector('.number.paid');
   assert.equal(await page.locator('.number.paid').count(),2);
   for (let i=2;i<=12;i++) await page.locator(`[data-number="${i}"]`).click();
   assert.equal(await page.locator('.number.selected').count(),10);
