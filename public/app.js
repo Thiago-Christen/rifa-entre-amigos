@@ -103,6 +103,23 @@ $('new-reservation').onclick = () => { $('receipt').hidden = true; $('reserve-fo
 $('copy-pix').onclick = async () => { try { await navigator.clipboard.writeText(config.pixKey); notice('Chave Pix copiada.'); } catch { notice('Selecione a chave Pix e copie manualmente.'); } };
 $('admin-open').onclick = async () => { $('admin-dialog').showModal(); if (demo) { admin = true; await loadAdmin().catch(e => notice(e.message)); } };
 $('admin-close').onclick = () => $('admin-dialog').close();
+const signupButton = document.createElement('button'); signupButton.type = 'button'; signupButton.className = 'secondary'; signupButton.textContent = 'Criar meu acesso';
+signupButton.disabled = !demo && config.adminSignupEnabled === false;
+$('login-form').append(signupButton);
+signupButton.onclick = async () => {
+  if (demo) return notice('O cadastro administrativo está disponível apenas com o banco conectado.');
+  if (!$('login-form').reportValidity()) return;
+  const email = $('admin-email').value.trim(); const password = $('admin-password').value;
+  if (password.length < 8) return notice('Escolha uma senha com pelo menos 8 caracteres.');
+  signupButton.disabled = true;
+  try {
+    const redirect = new URL('./',location.href).href;
+    await request(`/auth/v1/signup?redirect_to=${encodeURIComponent(redirect)}`,{email,password});
+    $('admin-password').value = '';
+    notice('Confira seu e-mail e confirme o cadastro. Depois entre com a senha escolhida. Somente o e-mail autorizado terá acesso ao painel.');
+  } catch(error) { notice(error.message); }
+  finally { signupButton.disabled = config.adminSignupEnabled === false; }
+};
 $('login-form').onsubmit = async event => {
   event.preventDefault(); const button = event.submitter; button.disabled = true;
   try { session = await request('/auth/v1/token?grant_type=password', { email:$('admin-email').value.trim(), password:$('admin-password').value }); $('admin-password').value = ''; admin = await rpc('is_admin'); if (!admin) { session = buyerAuth; throw new Error('Esta conta não tem permissão de administrador.'); } await loadAdmin(); }
@@ -141,6 +158,18 @@ document.title = config.title; $('title').textContent = config.title; $('descrip
 if (demo) { $('mode-banner').hidden = false; $('mode-banner').textContent = 'MODO DEMONSTRAÇÃO · As reservas são simulações salvas apenas neste navegador. Nenhum pagamento deve ser feito. Configure o banco de dados para compartilhar as reservas.'; }
 else if (config.reservationsEnabled === false) { $('mode-banner').hidden = false; $('mode-banner').textContent = 'As reservas serão abertas assim que o organizador concluir a configuração. Aguarde a abertura antes de fazer qualquer pagamento.'; }
 async function start() {
+  const callback = new URLSearchParams(location.hash.slice(1));
+  if (callback.has('access_token') || callback.has('error_description')) {
+    history.replaceState(null,'',location.pathname+location.search);
+    if (callback.has('error_description')) notice(callback.get('error_description'));
+    else {
+      session = {access_token:callback.get('access_token'),refresh_token:callback.get('refresh_token'),expires_at:Number(callback.get('expires_at')) || Math.floor(Date.now()/1000)+Number(callback.get('expires_in')||3600)};
+      await request('/auth/v1/user',null,'GET');
+      admin = await rpc('is_admin');
+      if (admin) { $('admin-dialog').showModal(); await loadAdmin(); }
+      else { session = buyerAuth; notice('E-mail verificado. Esta conta não está autorizada como organizador.'); }
+    }
+  }
   await refresh();
   const id = remembered('rifa-receipt-id'); if (!id) return;
   let booking;

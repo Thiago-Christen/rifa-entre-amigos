@@ -4,6 +4,8 @@ Site: https://thiago-christen.github.io/rifa-entre-amigos/
 
 Projeto gratuito Supabase: `ohpgwezeacxldhofmafl`, região São Paulo. O schema já foi aplicado no projeto hospedado; não execute novamente. `public/config.js` já está conectado ao banco, mas `reservationsEnabled` permanece `false` até concluir a autenticação anônima, criar o organizador e verificar o fluxo. Não receba pagamentos antes dessa ativação.
 
+O e-mail escolhido pelo organizador foi autorizado na tabela privada `admin_invites` (o endereço não está nos arquivos públicos). O usuário terá acesso ao painel depois de cadastrar e confirmar esse e-mail. Antes de ativar `adminSignupEnabled`, configure Site URL e Redirect URLs no Supabase como `https://thiago-christen.github.io/rifa-entre-amigos/`. Então use **Área do organizador > Criar meu acesso**, com e-mail e senha, e confirme a mensagem recebida. A senha não deve ser enviada ao assistente.
+
 100 números (01 a 100), R$ 10 por número e total possível de R$ 1.000. Site estático em HTML/CSS/JavaScript para GitHub Pages, com persistência compartilhada no Supabase/PostgreSQL.
 
 ## Visualizar

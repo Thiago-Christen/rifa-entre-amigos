@@ -8,4 +8,5 @@ window.RIFA_CONFIG = {
   supabaseUrl: 'https://ohpgwezeacxldhofmafl.supabase.co',
   supabasePublicKey: 'sb_publishable_K6yCDXeAK2dY5KsRAQlh9g_cAUo-VSx', // Chave pública. Nunca service_role.
   reservationsEnabled: false, // Ativar após configurar autenticação e organizador.
+  adminSignupEnabled: false, // Ativar depois de definir Site URL no Supabase.
 };

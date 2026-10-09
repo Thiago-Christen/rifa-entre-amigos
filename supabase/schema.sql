@@ -7,6 +7,10 @@ create policy admins_no_client_access on private.admins as restrictive for all t
 revoke all on schema private from public, anon, authenticated;
 grant usage on schema private to anon, authenticated;
 revoke all on private.admins from public, anon, authenticated;
+create table private.admin_invites(email text primary key check(email = lower(email)));
+alter table private.admin_invites enable row level security;
+revoke all on private.admin_invites from public, anon, authenticated;
+create policy admin_invites_no_client_access on private.admin_invites as restrictive for all to anon, authenticated using(false) with check(false);
 
 create table public.reservations (
   id uuid primary key default gen_random_uuid(),
@@ -25,7 +29,11 @@ grant select on public.reservations to authenticated;
 
 create function private.is_admin() returns boolean
 language sql stable security definer set search_path = ''
-as $$ select exists(select 1 from private.admins where user_id = auth.uid()); $$;
+as $$ select auth.uid() is not null and (
+  exists(select 1 from private.admins where user_id = auth.uid())
+  or exists(select 1 from private.admin_invites i join auth.users u on lower(u.email)=i.email
+    where u.id=auth.uid() and u.email_confirmed_at is not null and not coalesce(u.is_anonymous,false))
+); $$;
 revoke all on function private.is_admin() from public, anon;
 grant execute on function private.is_admin() to authenticated;
 
