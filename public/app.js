@@ -53,8 +53,8 @@ function render() {
   if (!selected.size) $('selected-list').textContent = 'Escolha um número ao lado para começar.';
   for (const n of [...selected].sort((a,b) => a-b)) { const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = fmt(n); $('selected-list').append(chip); }
   $('total').textContent = money(selected.size * 10);
-  $('reserve-button').disabled = !selected.size || loading;
-  $('reserve-button').textContent = loading ? 'Registrando…' : demo ? 'Simular reserva →' : 'Reservar meus números →';
+  $('reserve-button').disabled = !selected.size || loading || (!demo && config.reservationsEnabled === false);
+  $('reserve-button').textContent = !demo && config.reservationsEnabled === false ? 'Reservas em configuração' : loading ? 'Registrando…' : demo ? 'Simular reserva →' : 'Reservar meus números →';
 }
 async function refresh() {
   if (demo) {
@@ -81,7 +81,7 @@ $('numbers').addEventListener('click', event => {
   render();
 });
 $('reserve-form').addEventListener('submit', async event => {
-  event.preventDefault(); if (loading || !selected.size) return;
+  event.preventDefault(); if (loading || !selected.size || (!demo && config.reservationsEnabled === false)) return;
   const name = $('buyer-name').value.trim(); const phone = $('buyer-phone').value.replace(/\D/g, '');
   if (name.length < 2 || !/^\d{10,13}$/.test(phone)) return notice('Informe seu nome e um telefone válido com DDD.');
   if (!demo && !config.pixKey) return notice('O organizador ainda precisa cadastrar a chave Pix.');
@@ -139,6 +139,7 @@ $('admin-refresh').onclick = () => loadAdmin().catch(e => notice(e.message));
 $('logout').onclick = () => { session = buyerAuth; admin = false; $('login-form').hidden = false; $('admin-panel').hidden = true; $('admin-dialog').close(); };
 document.title = config.title; $('title').textContent = config.title; $('description').textContent = config.description; $('prize').textContent = config.prize; $('draw').textContent = config.draw;
 if (demo) { $('mode-banner').hidden = false; $('mode-banner').textContent = 'MODO DEMONSTRAÇÃO · As reservas são simulações salvas apenas neste navegador. Nenhum pagamento deve ser feito. Configure o banco de dados para compartilhar as reservas.'; }
+else if (config.reservationsEnabled === false) { $('mode-banner').hidden = false; $('mode-banner').textContent = 'As reservas serão abertas assim que o organizador concluir a configuração. Aguarde a abertura antes de fazer qualquer pagamento.'; }
 async function start() {
   await refresh();
   const id = remembered('rifa-receipt-id'); if (!id) return;

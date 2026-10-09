@@ -5,6 +5,7 @@ window.RIFA_CONFIG = {
   draw: 'Data e regras do sorteio a definir pelo organizador.',
   pixKey: '+5541992656161', // Telefone informado: (41) 99265-6161. Confirme no banco o formato cadastrado.
   pixRecipient: '',
-  supabaseUrl: '',
-  supabasePublicKey: '', // Somente publishable key ou anon key. Nunca service_role.
+  supabaseUrl: 'https://ohpgwezeacxldhofmafl.supabase.co',
+  supabasePublicKey: 'sb_publishable_K6yCDXeAK2dY5KsRAQlh9g_cAUo-VSx', // Chave pública. Nunca service_role.
+  reservationsEnabled: false, // Ativar após configurar autenticação e organizador.
 };

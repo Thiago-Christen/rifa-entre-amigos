@@ -1,5 +1,9 @@
 # Rifa entre amigos
 
+Site: https://thiago-christen.github.io/rifa-entre-amigos/
+
+Projeto gratuito Supabase: `ohpgwezeacxldhofmafl`, região São Paulo. O schema já foi aplicado no projeto hospedado; não execute novamente. `public/config.js` já está conectado ao banco, mas `reservationsEnabled` permanece `false` até concluir a autenticação anônima, criar o organizador e verificar o fluxo. Não receba pagamentos antes dessa ativação.
+
 100 números (01 a 100), R$ 10 por número e total possível de R$ 1.000. Site estático em HTML/CSS/JavaScript para GitHub Pages, com persistência compartilhada no Supabase/PostgreSQL.
 
 ## Visualizar
@@ -19,7 +23,7 @@ Sem as duas configurações do Supabase, o site funciona em **demonstração**, 
    insert into private.admins(user_id) values ('UUID-DO-USUARIO');
    ```
 
-5. Edite `public/config.js`: título, prêmio, regras/data do sorteio, chave Pix, favorecido, URL do projeto e **publishable key** (`sb_publishable_...`) ou chave pública legada **anon**. Nunca coloque `service_role`, secret key ou senha no site ou no GitHub.
+5. Edite `public/config.js`: título, prêmio, regras/data do sorteio, chave Pix, favorecido, URL do projeto e **publishable key** (`sb_publishable_...`) ou chave pública legada **anon**. Nunca coloque `service_role`, secret key ou senha no site ou no GitHub. No projeto já criado, a URL e a publishable key estão configuradas. Depois de habilitar o acesso anônimo e cadastrar o administrador, defina `reservationsEnabled: true`.
 6. Entre na Área do organizador com sua conta para confirmar os Pix recebidos ou cancelar reservas. A autorização é conferida no banco; não há senha administrativa no JavaScript.
 
 O estado dos números é consultado a cada 15 segundos. Reservas expiram após 24 horas e os números voltam a ficar disponíveis automaticamente; não é necessário cron. Os dados históricos permanecem no banco. Uma reserva expirada não pode ser confirmada: verifique o Pix e resolva com o participante antes de confirmar números já liberados. O comprador vê a instrução de pagamento após reservar, recuperável ao atualizar a mesma aba. Salve o código antes de fechar a aba, pois esta versão não oferece recuperação da identidade anônima após fechar a sessão do navegador.

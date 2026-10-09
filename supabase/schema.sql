@@ -2,7 +2,10 @@
 begin;
 create schema if not exists private;
 create table private.admins (user_id uuid primary key references auth.users(id) on delete cascade);
+alter table private.admins enable row level security;
+create policy admins_no_client_access on private.admins as restrictive for all to anon, authenticated using (false) with check (false);
 revoke all on schema private from public, anon, authenticated;
+grant usage on schema private to anon, authenticated;
 revoke all on private.admins from public, anon, authenticated;
 
 create table public.reservations (
@@ -20,9 +23,15 @@ alter table public.reservations enable row level security;
 revoke all on public.reservations from public, anon, authenticated;
 grant select on public.reservations to authenticated;
 
-create function public.is_admin() returns boolean
+create function private.is_admin() returns boolean
 language sql stable security definer set search_path = ''
 as $$ select exists(select 1 from private.admins where user_id = auth.uid()); $$;
+revoke all on function private.is_admin() from public, anon;
+grant execute on function private.is_admin() to authenticated;
+
+create function public.is_admin() returns boolean
+language sql stable security invoker set search_path = ''
+as $$ select private.is_admin(); $$;
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.is_admin() to authenticated;
 
@@ -30,7 +39,7 @@ create policy reservation_read on public.reservations for select to authenticate
 using (user_id = (select auth.uid()) or (select public.is_admin()));
 
 -- Retorna somente números e estados. Nunca expõe nomes, telefones ou códigos.
-create function public.get_numbers() returns table(number integer, status text)
+create function private.get_numbers() returns table(number integer, status text)
 language sql stable security definer set search_path = ''
 as $$
   select n, coalesce((select case when r.status = 'paid' then 'paid' else 'reserved' end
@@ -39,10 +48,16 @@ as $$
     limit 1), 'available')
   from generate_series(1,100) n order by n;
 $$;
+revoke all on function private.get_numbers() from public;
+grant execute on function private.get_numbers() to anon, authenticated;
+
+create function public.get_numbers() returns table(number integer, status text)
+language sql stable security invoker set search_path = ''
+as $$ select * from private.get_numbers(); $$;
 revoke all on function public.get_numbers() from public;
 grant execute on function public.get_numbers() to anon, authenticated;
 
-create function public.reserve_numbers(p_numbers integer[], p_name text, p_phone text)
+create function private.reserve_numbers(p_numbers integer[], p_name text, p_phone text)
 returns jsonb language plpgsql security definer set search_path = ''
 as $$
 declare result public.reservations; buyer uuid := auth.uid();
@@ -68,20 +83,32 @@ begin
     values(buyer,trim(p_name),p_phone,p_numbers,clock_timestamp(),clock_timestamp()+interval '24 hours') returning * into result;
   return to_jsonb(result) - 'user_id';
 end; $$;
+revoke all on function private.reserve_numbers(integer[],text,text) from public, anon;
+grant execute on function private.reserve_numbers(integer[],text,text) to authenticated;
+
+create function public.reserve_numbers(p_numbers integer[], p_name text, p_phone text)
+returns jsonb language sql security invoker set search_path = ''
+as $$ select private.reserve_numbers(p_numbers,p_name,p_phone); $$;
 revoke all on function public.reserve_numbers(integer[],text,text) from public, anon;
 grant execute on function public.reserve_numbers(integer[],text,text) to authenticated;
 
-create function public.admin_update_reservation(p_id uuid, p_status text)
+create function private.admin_update_reservation(p_id uuid, p_status text)
 returns void language plpgsql security definer set search_path = ''
 as $$
 begin
-  if not public.is_admin() then raise exception 'Acesso restrito ao organizador.'; end if;
+  if auth.uid() is null or not private.is_admin() then raise exception 'Acesso restrito ao organizador.'; end if;
   if p_status is null or p_status not in ('paid','cancelled') then raise exception 'Estado inválido.'; end if;
   perform pg_advisory_xact_lock(1001010);
   update public.reservations set status = p_status
     where id = p_id and status = 'pending' and expires_at > clock_timestamp();
   if not found then raise exception 'Reserva inexistente, expirada ou já processada.'; end if;
 end; $$;
+revoke all on function private.admin_update_reservation(uuid,text) from public, anon;
+grant execute on function private.admin_update_reservation(uuid,text) to authenticated;
+
+create function public.admin_update_reservation(p_id uuid, p_status text)
+returns void language sql security invoker set search_path = ''
+as $$ select private.admin_update_reservation(p_id,p_status); $$;
 revoke all on function public.admin_update_reservation(uuid,text) from public, anon;
 grant execute on function public.admin_update_reservation(uuid,text) to authenticated;
 commit;
