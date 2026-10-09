@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Escolha entre 100 números por R$ 10 cada e participe da nossa rifa.">
+  <title>Rifa entre amigos</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script><script src="app.js" type="module"></script>
+</head>
+<body>
+  <header class="topbar"><a href="./" class="brand"><span class="logo">✦</span> Rifa<span class="brand-light">entre amigos</span></a><button id="admin-open" class="text-button">Área do organizador ↗</button></header>
+  <main>
+    <div id="mode-banner" class="banner" role="status" hidden></div>
+    <section class="intro"><div><p class="eyebrow">100 NÚMEROS · UMA BOA CHANCE</p><h1 id="title">Rifa entre amigos</h1><p id="description" class="muted"></p></div><div class="price-tag"><span>CADA NÚMERO</span><strong>R$ 10<small>,00</small></strong></div></section>
+    <section class="prize-card"><div class="prize-icon" aria-hidden="true">✦</div><div><p class="eyebrow">O PRÊMIO DA VEZ</p><h2 id="prize"></h2><p id="draw" class="muted"></p></div><span class="pill">01 — 100</span></section>
+    <div class="layout"><section class="numbers-panel" aria-labelledby="numbers-title">
+      <div class="section-heading"><div><p class="eyebrow">ESCOLHA A SUA SORTE</p><h2 id="numbers-title">Quais são seus números?</h2></div><button id="refresh" class="text-button">↻ Atualizar</button></div>
+      <div class="availability"><span id="availability">Carregando números…</span><span id="paid-count"></span></div><div class="progress"><div id="progress-fill"></div></div>
+      <div class="legend"><span><i class="available"></i>Disponível</span><span><i class="selected"></i>Sua seleção</span><span><i class="reserved"></i>Reservado</span><span><i class="paid"></i>Pago</span></div>
+      <div id="numbers" class="number-grid" aria-label="Números da rifa"></div>
+      <p class="hint">Selecione até 10 números por reserva. Reservas aguardam pagamento por 24 horas.</p>
+    </section>
+    <aside class="checkout"><p class="eyebrow">FALTA POUCO PARA PARTICIPAR</p><h2>Sua reserva</h2><div id="selected-list" class="selection-summary">Escolha um número ao lado para começar.</div><div class="total"><span>Total</span><strong id="total">R$ 0,00</strong></div>
+      <form id="reserve-form"><label for="buyer-name">Seu nome</label><input id="buyer-name" name="name" placeholder="Como podemos te chamar?" required minlength="2" maxlength="80" autocomplete="name"><label for="buyer-phone">WhatsApp com DDD</label><input id="buyer-phone" name="phone" placeholder="(41) 99999-9999" required maxlength="20" type="tel" autocomplete="tel"><button id="reserve-button" class="primary" disabled>Reservar meus números <span>→</span></button><p class="hint">A reserva é confirmada após o organizador verificar o pagamento.</p></form>
+      <div id="receipt" hidden><h3>Reserva registrada!</h3><p id="receipt-details"></p><p id="receipt-reference" class="hint"></p><div class="pix-box"><span>Chave Pix</span><strong id="pix-key"></strong><p id="pix-recipient" class="hint"></p><button id="copy-pix" class="secondary">Copiar chave Pix</button></div><p class="hint">Pague o total informado e identifique seu pagamento com o código da reserva. Confirmação manual pelo organizador.</p><button id="new-reservation" class="text-button">Escolher mais números</button></div>
+    </aside></div>
+    <section class="how"><div><b>01</b><h3>Escolha</h3><p>Marque seus números favoritos.</p></div><div><b>02</b><h3>Reserve e pague</h3><p>Informe seu contato e faça o Pix.</p></div><div><b>03</b><h3>Acompanhe</h3><p>O organizador confirma seu pagamento.</p></div></section>
+  </main><footer><span>Feito para reunir amigos. ✦</span><span>100 números · R$ 10 por número</span></footer>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="admin-dialog"><div class="dialog-heading"><h2>Área do organizador</h2><button id="admin-close" class="text-button" aria-label="Fechar painel">✕</button></div><p id="admin-note" class="muted">Entre para acompanhar reservas e confirmar pagamentos.</p><form id="login-form"><label for="admin-email">E-mail</label><input id="admin-email" type="email" autocomplete="username" required><label for="admin-password">Senha</label><input id="admin-password" type="password" autocomplete="current-password" required><button class="primary">Entrar</button></form><section id="admin-panel" hidden><div class="admin-toolbar"><span id="admin-stats"></span><button id="admin-refresh" class="text-button">Atualizar</button><button id="logout" class="text-button">Sair</button></div><div id="admin-bookings"></div></section></dialog>
+</body></html>

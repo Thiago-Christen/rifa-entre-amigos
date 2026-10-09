@@ -1,0 +1,49 @@
+// Execute: node scripts/verify-ui.mjs CAMINHO/DO/PLAYWRIGHT/index.mjs
+// Inicia seu próprio servidor. Apenas testa dados de demonstração.
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+import { mkdir } from 'node:fs/promises';
+const { chromium } = await import(pathToFileURL(process.argv[2]).href);
+process.env.RIFA_PORT = '4174';
+const { server } = await import('./serve.mjs');
+const browser = await chromium.launch({headless:true,channel:'msedge'});
+const context = await browser.newContext({viewport:{width:1440,height:1100}});
+context.setDefaultTimeout(10000);
+await context.route('https://fonts.googleapis.com/**', route => route.abort());
+const page = await context.newPage(); const errors=[];
+page.on('pageerror', error => errors.push(error.message));
+try {
+  await page.goto('http://127.0.0.1:4174');
+  await page.waitForSelector('.number');
+  assert.equal(await page.locator('.number').count(),100);
+  assert.equal(await page.locator('.number:not(:disabled)').count(),100);
+  assert.equal(await page.locator('#prize').textContent(),'Cesta com 11 itens');
+  await page.locator('[data-number="1"]').click(); await page.locator('[data-number="100"]').click();
+  assert.match(await page.locator('#total').textContent(), /20,00/);
+  await page.locator('#buyer-name').fill('<img src=x onerror=alert(1)>');
+  await page.locator('#buyer-phone').fill('41999223344');
+  await page.locator('#reserve-button').click(); await page.waitForSelector('#receipt:visible');
+  assert.equal(await page.locator('.number.reserved').count(),2);
+  assert.equal(await page.locator('#copy-pix').isDisabled(),true);
+  await page.reload(); await page.waitForSelector('#receipt:visible');
+  assert.equal(await page.locator('.number.reserved').count(),2);
+  const other = await context.newPage(); await other.goto('http://127.0.0.1:4174'); await other.waitForSelector('.number.reserved');
+  assert.equal(await other.locator('[data-number="1"]').isDisabled(),true);
+  await page.locator('#admin-open').click(); await page.waitForSelector('.booking-card');
+  assert.equal(await page.locator('.booking-card img').count(),0);
+  page.on('dialog', dialog => dialog.accept());
+  await page.getByRole('button',{name:'Confirmar pagamento',exact:true}).click();
+  await page.waitForSelector('.number.paid');
+  assert.equal(await page.locator('.number.paid').count(),2);
+  await page.locator('#admin-close').click(); await page.reload(); await page.waitForSelector('.number.paid');
+  assert.equal(await page.locator('.number.paid').count(),2);
+  for (let i=2;i<=12;i++) await page.locator(`[data-number="${i}"]`).click();
+  assert.equal(await page.locator('.number.selected').count(),10);
+  await mkdir('test-results',{recursive:true});
+  await page.screenshot({path:'test-results/desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
+  await page.screenshot({path:'test-results/mobile.png',fullPage:true});
+  assert.deepEqual(errors,[]);
+  console.log('PASS: 100 números, total, reserva, persistência, recuperação, painel, confirmação, limite, escape de HTML e tela móvel.');
+} finally { await browser.close(); server.close(); }
