@@ -7,6 +7,6 @@ window.RIFA_CONFIG = {
   pixRecipient: '',
   supabaseUrl: 'https://ohpgwezeacxldhofmafl.supabase.co',
   supabasePublicKey: 'sb_publishable_K6yCDXeAK2dY5KsRAQlh9g_cAUo-VSx', // Chave pública. Nunca service_role.
-  reservationsEnabled: false, // Ativar após configurar autenticação e organizador.
+  reservationsEnabled: true, // Autenticação e organizador confirmados.
   adminSignupEnabled: true, // Site URL configurada no Supabase.
 };
