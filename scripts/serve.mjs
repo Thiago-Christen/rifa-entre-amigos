@@ -3,14 +3,14 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname, sep } from 'node:path';
 const root = fileURLToPath(new URL('../public/', import.meta.url));
-const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png' };
+const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp' };
 export const server = createServer(async (req,res) => {
   try {
     const pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname);
     // Demonstração isolada somente no servidor local; nunca publicada no Pages.
     if (process.env.RIFA_DEMO === '1' && pathname === '/config.js') {
       res.writeHead(200, {'Content-Type':mime['.js'],'Cache-Control':'no-store'});
-      res.end("window.RIFA_CONFIG={title:'Rifa entre amigos',prize:'Cesta com 11 itens',description:'Escolha seus números e participe. Cada número é uma nova chance!',draw:'Data e regras do sorteio a definir pelo organizador.',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};");
+      res.end("window.RIFA_CONFIG={title:'Rifa Ana e Thiago',prize:'Cesta com 11 itens',description:'Escolha seus números e participe. Cada número é uma nova chance!',draw:'Data e regras do sorteio a definir pelo organizador.',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};");
       return;
     }
     const target = resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));

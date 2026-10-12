@@ -99,6 +99,11 @@ async function refresh() {
   } else rows = await rpc('get_numbers');
   selected = new Set([...selected].filter(n => rows.some(r => r.number === n && r.status === 'available')));
   render();
+  if (lastReceipt && !active(lastReceipt)) {
+    $('pix-qr-box').hidden = true; $('pix-payload').value = ''; $('copy-pix').disabled = true;
+    $('receipt-details').textContent = 'Esta reserva expirou. Escolha os números novamente antes de pagar.';
+    lastReceipt = null; remember('rifa-receipt-id',null);
+  }
   if (admin && !$('organizer-view').hidden) renderBookings();
 }
 function showReceipt(booking) {
@@ -110,6 +115,16 @@ function showReceipt(booking) {
   $('pix-key').textContent = demo ? 'Demonstração — não faça pagamentos' : config.pixKey || 'Chave ainda não informada pelo organizador';
   $('pix-recipient').textContent = demo ? '' : config.pixRecipient;
   $('copy-pix').disabled = demo || !config.pixKey;
+  $('pix-qr-box').hidden = true; $('pix-payload').value = '';
+  if (!demo && config.pixRecipient && config.pixCity && window.RIFA_PIX) {
+    try {
+      const payload = window.RIFA_PIX.payload({key:config.pixKey,name:config.pixRecipient,city:config.pixCity,cents:booking.numbers.length * 1000,reference:booking.id});
+      window.RIFA_PIX.draw($('pix-qr'),payload);
+      $('pix-payload').value = payload;
+      $('pix-qr-amount').textContent = `Valor: ${money(booking.numbers.length * 10)}`;
+      $('pix-qr-box').hidden = false;
+    } catch { /* A chave continua disponível caso o gerador de QR Code falhe. */ }
+  }
 }
 $('numbers').addEventListener('click', event => {
   const button = event.target.closest('button[data-number]'); if (!button || button.disabled) return;
@@ -136,8 +151,13 @@ $('reserve-form').addEventListener('submit', async event => {
   finally { loading = false; try { await refresh(); } catch { render(); notice('Não foi possível atualizar os números. Clique em Atualizar.'); } }
 });
 $('refresh').onclick = () => refresh().catch(e => notice(e.message));
-$('new-reservation').onclick = () => { $('receipt').hidden = true; $('reserve-form').hidden = false; lastReceipt = null; remember('rifa-receipt-id',null); };
-$('copy-pix').onclick = async () => { try { await navigator.clipboard.writeText(config.pixKey); notice('Chave Pix copiada.'); } catch { notice('Selecione a chave Pix e copie manualmente.'); } };
+$('new-reservation').onclick = () => { $('receipt').hidden = true; $('reserve-form').hidden = false; $('pix-payload').value = ''; $('pix-qr-box').hidden = true; lastReceipt = null; remember('rifa-receipt-id',null); };
+$('copy-pix').onclick = async () => { if (!lastReceipt || !active(lastReceipt) || demo) return notice('Reserve seus números antes de pagar.'); try { await navigator.clipboard.writeText(config.pixKey); notice('Chave Pix copiada.'); } catch { notice('Selecione a chave Pix e copie manualmente.'); } };
+$('copy-pix-code').onclick = async () => {
+  const payload = $('pix-payload').value; if (!payload || demo || !lastReceipt || !active(lastReceipt)) return;
+  try { await navigator.clipboard.writeText(payload); notice('Código Pix copiado. Cole no app do seu banco.'); }
+  catch { $('pix-payload').focus(); $('pix-payload').select(); notice('Selecione e copie o código Pix manualmente.'); }
+};
 function showView(organizer) {
   $('customer-view').hidden = organizer; $('organizer-view').hidden = !organizer;
   $('customer-nav').hidden = organizer;

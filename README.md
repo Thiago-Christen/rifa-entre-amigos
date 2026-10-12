@@ -1,4 +1,4 @@
-# Rifa entre amigos
+# Rifa Ana e Thiago
 
 A interface usa tons verdes, cartões arredondados e a foto da cesta em destaque. Clientes selecionam e reservam números sem criar conta. O botão **Organizador** abre o login; após a autorização no banco, a compra sai de cena e um painel próprio mostra reservas, filtros, busca e valores confirmados. A sessão do organizador é restaurada na mesma aba e revalidada no servidor; **Sair da conta** encerra o acesso. Atualizações automáticas a cada 15 segundos e animações com suporte a movimento reduzido.
 
@@ -57,3 +57,11 @@ Teste a mesma rifa em dois navegadores diferentes: reserve um número num deles 
 Pagamento via chave Pix, com confirmação manual. Não inclui processamento automático de pagamentos, QR Code Pix, envio de mensagens, sorteio automático ou verificação legal da modalidade da rifa. Prêmio, data e regras devem ser definidos pelo organizador antes da abertura. Ainda depende da configuração e publicação nas suas contas para funcionar online com dados reais.
 
 Referências: [GitHub Pages com Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site), [funções de banco no Supabase](https://supabase.com/docs/guides/database/functions), [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+
+## Catálogo e Pix
+
+O botão Ver itens da rifa abre um carrossel acessível com 11 representações individuais recriadas a partir da foto. A cesta principal está sem a nota fiscal. As imagens WebP são carregadas sob demanda no catálogo; os PNG originais ficam em output/imagegen/originals localmente.
+
+Para habilitar QR Code e Pix Copia e Cola, preencha pixRecipient e pixCity em public/config.js com os dados confirmados do titular da chave. O gerador monta um BR Code estático localmente, com o valor da reserva e referência de até 25 caracteres; não chama serviços de pagamento. A confirmação continua manual pelo organizador. A chave informada deve estar cadastrada no banco. Sem os campos confirmados, permanece disponível a cópia da chave.
+
+Validação: npm run check, npm run test:auth e npm run test:pix. O teste Pix usa o vetor de CRC da seção 2.6.3 do Manual de Padrões para Iniciação do Pix do Banco Central e dados fictícios. Biblioteca local qrcode-generator 1.4.4 (MIT), licença em public/vendor/qrcode-LICENSE.txt.

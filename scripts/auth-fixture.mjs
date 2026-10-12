@@ -13,13 +13,13 @@ const bookings = [
   {id:'fixture-expired',name:'Reserva expirada de teste',phone:'41999990002',numbers:[4],status:'pending',created_at:new Date(now-172800000).toISOString(),expires_at:new Date(now-86400000).toISOString()},
 ];
 let revoked = false;
-const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.svg':'image/svg+xml'};
+const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml'};
 const server = createServer(async(req,res) => {
   const url = new URL(req.url,'http://127.0.0.1:4176');
   const json = (value,status=200) => {res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
   try {
     if (url.pathname === '/config.js') {
-      const config = {title:'Rifa entre amigos',prize:'Cesta com 11 itens',description:'Escolha seus números e participe. Cada número é uma nova chance!',draw:'Data e regras do sorteio a definir pelo organizador.',pixKey:'TESTE — NÃO PAGAR',pixRecipient:'',supabaseUrl:'http://127.0.0.1:4176/mock',supabasePublicKey:'fixture-public-key',reservationsEnabled:true,adminSignupEnabled:false};
+      const config = {title:'Rifa Ana e Thiago',prize:'Cesta com 11 itens',description:'Estamos juntando para comprar nossas coisas e construir nossa vida juntos. Participe da nossa rifa e concorra a uma cesta especial!',draw:'Ambiente isolado de teste. Não faça pagamentos.',pixKey:'fixture@example.test',pixRecipient:'TESTE NAO PAGAR',pixCity:'CIDADE TESTE',supabaseUrl:'http://127.0.0.1:4176/mock',supabasePublicKey:'fixture-public-key',reservationsEnabled:true,adminSignupEnabled:false};
       res.writeHead(200,{'Content-Type':mime['.js'],'Cache-Control':'no-store'});res.end('window.RIFA_CONFIG='+JSON.stringify(config));return;
     }
     if (url.pathname.startsWith('/mock/')) {
@@ -38,6 +38,14 @@ const server = createServer(async(req,res) => {
       if (url.pathname.endsWith('/is_admin')) return json(allowed);
       if (url.pathname.endsWith('/auth/v1/user')) return allowed ? json({id:'fixture-organizer',email:'organizador@example.test'}) : json({message:'Acesso inválido.'},401);
       if (url.pathname.endsWith('/auth/v1/logout')) {revoked=true;return json({});}
+      if (url.pathname.endsWith('/auth/v1/signup')) return json({access_token:'fixture-client-token',expires_at:Math.floor(Date.now()/1000)+3600});
+      if (url.pathname.endsWith('/reserve_numbers')) {
+        if (allowed || req.headers.authorization !== 'Bearer fixture-client-token') return json({message:'Acesso de cliente necessário.'},403);
+        if (!Array.isArray(body.p_numbers) || !body.p_numbers.length || body.p_numbers.length > 10) return json({message:'Seleção inválida.'},400);
+        if (bookings.some(b => b.numbers.some(n => body.p_numbers.includes(n)) && (b.status === 'paid' || (b.status === 'pending' && Date.parse(b.expires_at)>Date.now())))) return json({message:'Número indisponível.'},400);
+        const b = {id:crypto.randomUUID(),name:body.p_name,phone:body.p_phone,numbers:body.p_numbers,status:'pending',created_at:new Date().toISOString(),expires_at:new Date(Date.now()+86400000).toISOString()};
+        bookings.push(b); return json(b);
+      }
       if (!allowed) return json({message:'Acesso restrito ao organizador.'},403);
       if (url.pathname.endsWith('/reservations')) return json(bookings);
       if (url.pathname.endsWith('/admin_update_reservation')) {

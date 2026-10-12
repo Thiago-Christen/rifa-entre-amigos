@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": {"start": "node scripts/serve.mjs", "check": "node --check public/app.js && node --check public/config.js", "test:auth": "node scripts/check-auth.mjs"}
+  "scripts": {"start": "node scripts/serve.mjs", "check": "node --check public/app.js && node --check public/config.js && node --check public/catalog.js && node --check public/pix.js", "test:auth": "node scripts/check-auth.mjs", "test:pix":"node scripts/check-pix.mjs"}
 }
