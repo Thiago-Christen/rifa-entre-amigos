@@ -8,7 +8,7 @@ process.env.RIFA_PORT = '4174';
 const { server } = await import('./serve.mjs');
 const browser = await chromium.launch({headless:true,channel:'msedge'});
 const context = await browser.newContext({viewport:{width:1440,height:1100}});
-await context.route('**/config.js*', route => route.fulfill({contentType:'application/javascript',body:"window.RIFA_CONFIG={title:'Rifa entre amigos',prize:'Cesta com 11 itens',description:'Demonstração',draw:'Teste',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};"}));
+await context.route('**/config.js*', route => route.fulfill({contentType:'application/javascript',body:"window.RIFA_CONFIG={title:'Rifa entre amigos',prize:'Cesta com 13 produtos',description:'Demonstração',draw:'Teste',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};"}));
 context.setDefaultTimeout(10000);
 await context.route('https://fonts.googleapis.com/**', route => route.abort());
 const page = await context.newPage(); const errors=[];
@@ -18,7 +18,7 @@ try {
   await page.waitForSelector('.number');
   assert.equal(await page.locator('.number').count(),100);
   assert.equal(await page.locator('.number:not(:disabled)').count(),100);
-  assert.equal(await page.locator('#prize').textContent(),'Cesta com 11 itens');
+  assert.equal(await page.locator('#prize').textContent(),'Cesta com 13 produtos');
   await page.locator('[data-number="1"]').click(); await page.locator('[data-number="100"]').click();
   assert.match(await page.locator('#total').textContent(), /20,00/);
   await page.locator('#buyer-name').fill('<img src=x onerror=alert(1)>');

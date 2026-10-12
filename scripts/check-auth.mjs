@@ -47,6 +47,13 @@ const context=vm.createContext({
 });
 vm.runInContext(source,context);
 await new Promise(resolve=>setImmediate(resolve));
+for (const [typed, formatted] of [['41992656161','(41) 99265-6161'],['4133334444','(41) 3333-4444'],['+55 (41) 99265-6161','(41) 99265-6161'],['abc','']]) {
+  const input=elements['buyer-phone'];input.value=typed;input.selectionStart=typed.length;
+  input.setSelectionRange=(start,end)=>{input.selectionStart=start;input.selectionEnd=end;};
+  input.handlers.input({target:input});
+  assert.equal(input.value,formatted,'Máscara de telefone com DDD, fixo, celular ou prefixo brasileiro');
+  assert.equal(input.selectionStart,formatted.length);
+}
 assert.equal(elements['organizer-view'].hidden,true);
 elements['admin-email'].value='cliente@example.test';elements['admin-password'].value='senha-ficticia';
 const submit=()=>elements['login-form'].onsubmit({preventDefault(){},submitter:new Element()});

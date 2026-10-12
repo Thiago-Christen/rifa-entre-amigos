@@ -1,15 +1,17 @@
 const products = [
-  ['taca','Taça decorada','Um brinde aos bons momentos. Taça transparente com decoração floral em tons de lilás.','Para brindar'],
-  ['panos','Kit de panos','Panos claros com detalhes azuis, apresentados juntos com uma fita lilás. Um toque de carinho para a cozinha.','Para a casa'],
-  ['pote','Pote decorado','Pote de vidro com tampa, alça de corda e laços lilás. Um detalhe delicado para guardar pequenas coisas.','Para a casa'],
-  ['pringles','Pringles','A lata verde de Pringles que faz parte da cesta, para acompanhar seus momentos de pausa.','Para saborear'],
-  ['chocolates-nestle','Chocolates Nestlé','Caixa Nestlé Especialidades: chocolates para compartilhar ou aproveitar aos poucos.','Para saborear'],
-  ['chocolates-azul','Caixa de chocolates','A caixa de embalagem azul que acompanha a cesta. Mais um presente para quem gosta de um momento doce.','Para saborear'],
-  ['vinho','Garrafa de vinho','A garrafa que acompanha o prêmio, para completar a cesta e celebrar uma ocasião especial.','Para brindar'],
-  ['kaiak','Natura Kaiak','Item da linha Natura Kaiak, na embalagem clara com detalhes azuis apresentada na cesta.','Para se cuidar'],
-  ['siage','Eudora Siàge','Produto da linha Eudora Siàge que integra o prêmio, em embalagem tipo refil.','Para se cuidar'],
-  ['tododia','Natura Tododia','Conjunto de embalagens Natura Tododia em tons de rosa e branco, para completar os cuidados do dia a dia.','Para se cuidar'],
-  ['pao-diario','Pão Diário','Livro devocional Pão Diário: uma companhia para seus momentos de leitura e reflexão.','Para inspirar'],
+  ["taca-real","Taça de vidro","Uma taça de vidro transparente com haste e acabamento liso. Um convite para brindar e celebrar as pequenas conquistas.","Para brindar"],
+  ["trilho","Trilho de mesa · 1,80 m × 40 cm","Trilho de mesa de 1,80 m de comprimento por 40 cm de largura, com flores azuis, detalhes verdes e acabamento branco rendado com fita azul.","Para a casa"],
+  ["pote-real","Pote decorado de Páscoa","Pote de vidro com tampa dourada, alça de corda e laços lilás. A decoração traz um coelho e a mensagem “Feliz Páscoa!”.","Para a casa"],
+  ["pringles-real","Pringles · Creme e Cebola","Uma lata de batatas Pringles sabor Creme e Cebola. Um snack crocante para acompanhar um filme ou dividir um momento de pausa.","Para saborear"],
+  ["nestle-real","Nestlé Especialidades · 220 g","Caixa Nestlé Especialidades com 220 g de chocolates variados. Diferentes sabores para saborear e compartilhar.","Para saborear"],
+  ["lacta","Lacta Favoritos · 250,6 g","Caixa de chocolates sortidos Lacta Favoritos, com 250,6 g e a mensagem “Te adoro” na embalagem. Um presente doce para aproveitar com carinho.","Para saborear"],
+  ["vinho-real","Vinho Invictas Carménère · 2025","Uma garrafa de vinho tinto chileno Invictas Carménère, safra 2025, da região do Valle Central. Para acompanhar uma ocasião especial.","Para brindar"],
+  ["kaiak-real","Natura Kaiak · Refil 100 ml","Refil de 100 ml do desodorante corporal masculino em spray Natura Kaiak. Uma opção de cuidado para o dia a dia; a embalagem é de refil.","Para se cuidar"],
+  ["siage-real","Eudora Siàge Cica-Therapy · 250 g","Refil de 250 g da máscara capilar Eudora Siàge Cica-Therapy, da etapa de reconstrução. Um cuidado para incluir na rotina dos cabelos.","Para se cuidar"],
+  ["tododia-sabonetes","Tododia · Sabonetes Cereja e Avelã","Uma caixa Natura Tododia Cereja e Avelã com 5 sabonetes em barra de 90 g cada (450 g no total). Feitos com base vegetal e livres de gordura animal, conforme a embalagem.","Para se cuidar"],
+  ["tododia-amora","Tododia · Amora Vermelha e Jabuticaba","Creme para o corpo Natura Tododia com nutrição prebiótica, fragrância Amora Vermelha e Jabuticaba, com 200 ml.","Para se cuidar"],
+  ["tododia-noz","Tododia · Noz Pecã e Cacau","Creme para o corpo Natura Tododia com nutrição prebiótica, fragrância Noz Pecã e Cacau, com 200 ml.","Para se cuidar"],
+  ["pao-real","Pão Diário · 365 devocionais","Livro Pão Diário com 365 devocionais para seu tempo com Deus. Uma leitura para reservar um momento de reflexão a cada dia.","Para inspirar"],
 ];
 const $ = id => document.getElementById(id);
 const dialog = $('items-dialog');

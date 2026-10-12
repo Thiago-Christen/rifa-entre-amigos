@@ -2,6 +2,33 @@ const config = window.RIFA_CONFIG;
 const $ = id => document.getElementById(id);
 const money = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 const fmt = n => String(n).padStart(2, '0');
+// Exibe o telefone com DDD e envia apenas os dígitos ao banco.
+function phoneDigits(value) {
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('55') && digits.length > 11) digits = digits.slice(2);
+  return digits.slice(0, 11);
+}
+function formatPhone(value) {
+  const digits = phoneDigits(value);
+  if (!digits) return '';
+  if (digits.length <= 2) return `(${digits}`;
+  const split = digits.length > 10 ? 7 : 6;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, split)}${digits.length > split ? '-' + digits.slice(split) : ''}`;
+}
+$('buyer-phone').addEventListener('input', event => {
+  const input = event.target;
+  const before = input.value;
+  const position = input.selectionStart ?? before.length;
+  const atEnd = position === before.length;
+  const count = before.slice(0, position).replace(/\D/g, '').length;
+  input.value = formatPhone(before);
+  if (atEnd) input.setSelectionRange(input.value.length, input.value.length);
+  else {
+    let caret = 0, seen = 0;
+    while (caret < input.value.length && seen < count) { if (/\d/.test(input.value[caret])) seen++; caret++; }
+    input.setSelectionRange(caret, caret);
+  }
+});
 const demo = !config.supabaseUrl || !config.supabasePublicKey;
 function remembered(key) { try { return JSON.parse(sessionStorage.getItem(key) || 'null'); } catch { return null; } }
 function remember(key, value) { try { if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key,JSON.stringify(value)); } catch { /* Reserva continua disponível no banco quando armazenamento local é bloqueado. */ } }
@@ -134,8 +161,8 @@ $('numbers').addEventListener('click', event => {
 });
 $('reserve-form').addEventListener('submit', async event => {
   event.preventDefault(); if (admin || loading || !selected.size || (!demo && config.reservationsEnabled === false)) return;
-  const name = $('buyer-name').value.trim(); const phone = $('buyer-phone').value.replace(/\D/g, '');
-  if (name.length < 2 || !/^\d{10,13}$/.test(phone)) return notice('Informe seu nome e um telefone válido com DDD.');
+  const name = $('buyer-name').value.trim(); const phone = phoneDigits($('buyer-phone').value);
+  if (name.length < 2 || !/^[1-9]\d{9,10}$/.test(phone)) return notice('Informe seu nome e um telefone com DDD, como (41) 99999-9999.');
   if (!demo && !config.pixKey) return notice('O organizador ainda precisa cadastrar a chave Pix.');
   loading = true; render();
   try {

@@ -4,6 +4,8 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname, sep } from 'node:path';
+const port = Number(process.env.RIFA_TEST_PORT || 4176);
+const origin = `http://127.0.0.1:${port}`;
 const root = fileURLToPath(new URL('../public/',import.meta.url));
 const token = 'fixture-organizer-token';
 const now = Date.now();
@@ -15,11 +17,11 @@ const bookings = [
 let revoked = false;
 const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml'};
 const server = createServer(async(req,res) => {
-  const url = new URL(req.url,'http://127.0.0.1:4176');
+  const url = new URL(req.url,origin);
   const json = (value,status=200) => {res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
   try {
     if (url.pathname === '/config.js') {
-      const config = {title:'Rifa Ana e Thiago',prize:'Cesta com 11 itens',description:'Estamos juntando para comprar nossas coisas e construir nossa vida juntos. Participe da nossa rifa e concorra a uma cesta especial!',draw:'Ambiente isolado de teste. Não faça pagamentos.',pixKey:'fixture@example.test',pixRecipient:'TESTE NAO PAGAR',pixCity:'CIDADE TESTE',supabaseUrl:'http://127.0.0.1:4176/mock',supabasePublicKey:'fixture-public-key',reservationsEnabled:true,adminSignupEnabled:false};
+      const config = {title:'Rifa Ana e Thiago',prize:'Cesta com 13 produtos',description:'Estamos juntando para comprar nossas coisas e construir nossa vida juntos. Participe da nossa rifa e concorra a uma cesta especial!',draw:'Ambiente isolado de teste. Não faça pagamentos.',pixKey:'fixture@example.test',pixRecipient:'TESTE NAO PAGAR',pixCity:'CIDADE TESTE',supabaseUrl:origin+'/mock',supabasePublicKey:'fixture-public-key',reservationsEnabled:true,adminSignupEnabled:false};
       res.writeHead(200,{'Content-Type':mime['.js'],'Cache-Control':'no-store'});res.end('window.RIFA_CONFIG='+JSON.stringify(config));return;
     }
     if (url.pathname.startsWith('/mock/')) {
@@ -59,4 +61,4 @@ const server = createServer(async(req,res) => {
     const data = await readFile(path);res.writeHead(200,{'Content-Type':mime[extname(path)]||'application/octet-stream','Cache-Control':'no-store'});res.end(data);
   }catch{json({message:'Arquivo não encontrado.'},404);}
 });
-server.listen(4176,'127.0.0.1',()=>console.log('Teste isolado: http://127.0.0.1:4176 — login organizador@example.test / qualquer senha fictícia.'));
+server.listen(port,'127.0.0.1',()=>console.log(`Teste isolado: ${origin} — login organizador@example.test / qualquer senha fictícia.`));

@@ -10,7 +10,7 @@ export const server = createServer(async (req,res) => {
     // Demonstração isolada somente no servidor local; nunca publicada no Pages.
     if (process.env.RIFA_DEMO === '1' && pathname === '/config.js') {
       res.writeHead(200, {'Content-Type':mime['.js'],'Cache-Control':'no-store'});
-      res.end("window.RIFA_CONFIG={title:'Rifa Ana e Thiago',prize:'Cesta com 11 itens',description:'Escolha seus números e participe. Cada número é uma nova chance!',draw:'Data e regras do sorteio a definir pelo organizador.',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};");
+      res.end("window.RIFA_CONFIG={title:'Rifa Ana e Thiago',prize:'Cesta com 13 produtos',description:'Escolha seus números e participe. Cada número é uma nova chance!',draw:'Data e regras do sorteio a definir pelo organizador.',pixKey:'',pixRecipient:'',supabaseUrl:'',supabasePublicKey:''};");
       return;
     }
     const target = resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
